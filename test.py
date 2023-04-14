@@ -1,6 +1,7 @@
 from Crypto.Cipher import AES
 import os
- 
+
+HEADER_SIZE = 54  # bytes
 
 def pkcs7_padding(input_data):
     padding_length = BLOCK_SIZE - len(input_data) % BLOCK_SIZE
