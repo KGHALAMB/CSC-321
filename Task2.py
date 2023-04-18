@@ -36,7 +36,3 @@ def byteFlip(cipher_text):
 
 print(verify(submit("#admin^true#", key, iv),key,iv))
 print(verify(byteFlip(submit("#admin^true", key, iv)), key, iv))
-
-#userid=456;userdata=#admin^true#;session-id=31337
-
-#print(verify(submit(";admin=true;", key, iv),key,iv))
