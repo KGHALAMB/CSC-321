@@ -1,7 +1,8 @@
+import struct
 from Crypto.Cipher import AES
 import os
 
-HEADER_SIZE = 54  # bytes
+header_size = 54  # bytes
 BLOCK_SIZE = 16 #16 Bytes = 128 bits
 
 def pkcs7_padding(input_data):
@@ -39,7 +40,9 @@ def cbc_encrypt(key, iv, plaintext):
 
 def encrypt_ecb(input_file, output_file):
     with open(input_file, "rb") as f:
+        bmp_header = f.read(54)
         plaintext = f.read()
+
     plaintext = pkcs7_padding(plaintext)
     key = make_key()
     ciphertext = b""
@@ -47,22 +50,26 @@ def encrypt_ecb(input_file, output_file):
         block = plaintext[i:i + BLOCK_SIZE]
         encrypted_block = ecb_encrypt(key, block)
         ciphertext += encrypted_block
+
     with open(output_file, "wb") as f:
+        f.write(bmp_header)
         f.write(ciphertext)
 
 
 def encrypt_cbc(input_file, output_file):
     with open(input_file, "rb") as f:
+        bmp_header = f.read(54)
         plaintext = f.read()
     plaintext = pkcs7_padding(plaintext)
     key = make_key()
     iv = make_iv()
     ciphertext = cbc_encrypt(key, iv, plaintext)
     with open(output_file, "wb") as f:
+        f.write(bmp_header)
         f.write(ciphertext)
 
 
-input_file = "cp-logo.bmp"
+input_file = "mustang.bmp"
 output_file_ecb = "output_ecb.bmp"
 output_file_cbc = "output_cbc.bmp"
 
