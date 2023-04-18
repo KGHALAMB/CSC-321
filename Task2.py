@@ -17,24 +17,26 @@ def submit(input_string, key, iv):
 
 def verify(input_string, key, iv):
     cipher = AES.new(key, AES.MODE_CBC, iv)
-    plaintext = (Task1.pkcs7_unpadding(cipher.decrypt(input_string))).decode('utf-8')
-    plaintext = replaceURL(plaintext)
-    #print(plaintext)
-    res = plaintext.find(";admin=true;")
+    plaintext = (Task1.pkcs7_unpadding(cipher.decrypt(input_string)))
+    print("plaintext: ", plaintext)
+    res = str(plaintext).find(";admin=true;")
     if res == -1:
         return False
     else:
         return True
-    
-def replaceURL(cipher_text):
-    cipher_text = cipher_text.replace("%3D", "=")
-    cipher_text = cipher_text.replace("%3B", ";")
-    return cipher_text
 
 def byteFlip(cipher_text):
-    print(cipher_text)
+    cipher_text = bytearray(cipher_text)
+    cipher_text[4] = ord(chr(cipher_text[4])) ^ ord(";") ^ ord("#")
+    cipher_text[10] = ord(chr(cipher_text[10])) ^ ord("=") ^ ord("^")
+    #cipher_text[15] = ord(chr(cipher_text[15])) ^ ord(";") ^ ord("#")
+    cipher_text = bytes(cipher_text)
+    return cipher_text
 
 
-#byteFlip(submit("userid=456;userdata=You’re the man now, dog;session-id=31337", key, iv))
-print(verify(submit("userid=456;userdata=You’re the man now, dog;session-id=31337", key, iv),key,iv))
-print(verify(submit("userid=456;userdata=You’re the man now, dog;session-id=31337;admin=true", key, iv),key,iv))
+print(verify(submit("#admin^true#", key, iv),key,iv))
+print(verify(byteFlip(submit("#admin^true", key, iv)), key, iv))
+
+#userid=456;userdata=#admin^true#;session-id=31337
+
+#print(verify(submit(";admin=true;", key, iv),key,iv))
