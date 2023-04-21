@@ -1,10 +1,12 @@
 from Crypto.Cipher import AES
 import hashlib
 import myAES
+import secrets
+
 def keyExchange(q, alpha):
-    Xa = 6
+    Xa = secrets.randbelow(q) + 1
     Ya = alpha^(Xa) % q
-    Xb = 15
+    Xb = secrets.randbelow(q) + 1
     Yb = alpha^Xb % q
     #print("The Key for A", Xa)
     #print("The Key for B", Xb)
@@ -67,3 +69,4 @@ BigA = "A4D1CBD5 C3FD3412 6765A442 EFB99905 F8104DD2 58AC507FD6406CFF 14266D31 2
 BigA = int((BigA.replace(" ", "")), 16)
 
 keyExchange(BigQ, BigA)
+
