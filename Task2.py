@@ -17,9 +17,9 @@ def submit(input_string, key, iv):
 
 def verify(input_string, key, iv):
     cipher = AES.new(key, AES.MODE_CBC, iv)
-    plaintext = (Task1.pkcs7_unpadding(cipher.decrypt(input_string)))
+    plaintext = (Task1.pkcs7_unpadding(cipher.decrypt(input_string))).decode(errors='ignore')
     print("plaintext: ", plaintext)
-    res = str(plaintext).find(";admin=true;")
+    res = plaintext.find(";admin=true;")
     if res == -1:
         return False
     else:
@@ -29,10 +29,11 @@ def byteFlip(cipher_text):
     cipher_text = bytearray(cipher_text)
     cipher_text[4] = ord(chr(cipher_text[4])) ^ ord(";") ^ ord("#")
     cipher_text[10] = ord(chr(cipher_text[10])) ^ ord("=") ^ ord("^")
-    #cipher_text[15] = ord(chr(cipher_text[15])) ^ ord(";") ^ ord("#")
     cipher_text = bytes(cipher_text)
     return cipher_text
 
 
+print("Before the byte flip:")
 print(verify(submit("#admin^true#", key, iv),key,iv))
+print("After the byte flip:")
 print(verify(byteFlip(submit("#admin^true", key, iv)), key, iv))
