@@ -31,7 +31,6 @@ def keyExchange(q, alpha):
     iv = myAES.make_iv()
     msgA_byte = ("hi bob").encode('utf-8')
     msgA = myAES.cbc_encrypt(hashedKeyA, iv, myAES.pkcs7_padding(msgA_byte))
-    print("Alice sent: ", msgA)
 
     #Bob decrypts message from Alice
     cipherB = AES.new(hashedKeyB, AES.MODE_CBC, iv)
@@ -52,8 +51,10 @@ def keyExchange(q, alpha):
     plaintextA = (myAES.pkcs7_unpadding(cipherA.decrypt(msgM))).decode()
     print("Alice received: ", plaintextA)
 
+
 def keyHash(key):
     return(hashlib.sha256(str(key).encode()).hexdigest())
+
 
 def keyExchangeBig(q, alpha):
     #Xa = key for A
@@ -96,5 +97,5 @@ BigQ = int((BigQ.replace(" ", "")), 16)
 BigA = "A4D1CBD5 C3FD3412 6765A442 EFB99905 F8104DD2 58AC507FD6406CFF 14266D31 266FEA1E 5C41564B 777E690F 5504F213160217B4 B01B886A 5E91547F 9E2749F4 D7FBD7D3 B9A92EE1909D0D22 63F80A76 A6A24C08 7A091F53 1DBF0A01 69B6A28AD662A4D1 8E73AFA3 2D779D59 18D08BC8 858F4DCE F97C2A24855E6EEB 22B3B2E5"
 BigA = int((BigA.replace(" ", "")), 16)
 
-keyExchange(BigQ, BigA)
+#keyExchange(BigQ, BigA)
 
