@@ -33,12 +33,12 @@ def keyExchange(q, alpha):
     msgA = myAES.cbc_encrypt(hashedKeyA, iv, myAES.pkcs7_padding(msgA_byte))
 
     #Bob decrypts message from Alice
-    cipherB = AES.new(hashedKeyB, AES.MODE_CBC, iv)
+    cipherB = AES.new(hashedKeyA, AES.MODE_CBC, iv)
     plaintextB = (myAES.pkcs7_unpadding(cipherB.decrypt(msgA))).decode()
     print("Bob received: ", plaintextB)
 
-    #Malloary intercepts message from Alice and decrypts it
-    cipherB = AES.new(hashedKeyB, AES.MODE_CBC, iv)
+    #Mallory intercepts message from Alice and decrypts it
+    cipherB = AES.new(hashedKeyA, AES.MODE_CBC, iv)
     plaintextB = (myAES.pkcs7_unpadding(cipherB.decrypt(msgA))).decode()
     print("Mallory intercepted and decrypted: ", plaintextB)
 
