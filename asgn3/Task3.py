@@ -17,10 +17,10 @@ def rsaKey(bits):
     return {"publicKey" : publicKey, "privateKey" : privateKey}
 
 def rsaEncrypt(publicKey, plaintext):
+    #print("The plaintext is: ", plaintext)
     msg = int(plaintext.encode().hex(), 16)
     e = publicKey[0]
     n = publicKey[1]
-    #print("original msg: ", plaintext)
     if msg > n:
         raise ValueError
     cipher = pow(msg, e, n)
@@ -30,9 +30,10 @@ def rsaDecrypt(privateKey, ciphertext):
     d = privateKey[0]
     n = privateKey[1]
     plain = pow(ciphertext, d, n)
-    msg = bytes.fromhex((hex(plain))[2:]).decode()
-    #print("plaintext is: ", msg)
-    return plain
+    hex_str = '{:0>2x}'.format(plain)
+    msg = bytes.fromhex(hex_str).decode()
+    #print("decrypted: ", msg)
+    return msg
 def keyHash(key):
     return(hashlib.sha256(str(key).encode()).hexdigest())
 
@@ -49,17 +50,19 @@ def keyExchangeMallory(AESKey, AESIv, rsaKey):
     #Alice encrypts the AES Key
     encrypted = rsaEncrypt(rsaKey["publicKey"], str(AESKey))
     #mallory tampers with the cipher text that alice makes
-    tamperedEncrypted = encrypted^encrypted
-    #bob Decrypts the tampered text and uses the key he gets
-    hashedKey = (keyHash(tamperedEncrypted)[:32]).encode()
-    msg_byte = ("hi bob").encode('utf-8')
+    tamperedEncrypted = int(encrypted * 0)
+    #bob Decrypts the tampered text and uses the key he gets, mallory knows that the result 
+    # Bob will get from RSA decrypt is 0
+    key = rsaDecrypt(rsaKey["privateKey"], tamperedEncrypted)
+    hashedKey = (keyHash(key)[:32]).encode()
+    #mallory at this point knows what the key returned from rsa will be so she can use it
+    mallHashedKey = (keyHash('\x00')[:32]).encode()
+    msg_byte = ("Hi Bob!").encode('utf-8')
     msg = myAES.cbc_encrypt(hashedKey, AESIv, myAES.pkcs7_padding(msg_byte))
-    #mallory takes the cipher text and divides it by 2
-
-    print("The AES Key is this: ", AESKey)
-    
-    #mallCipher = AES.new(msg, AES.MODE_CBC, AESIv)
-    #mallPlainText = (myAES.pkcs7_unpadding(mallCipher.decrypt(msg))).decode()
+    #mallory can figure out what the encrypted message is, purely through her own hashed key
+    mallCipher = AES.new(mallHashedKey, AES.MODE_CBC, AESIv)
+    mallPlainText = (myAES.pkcs7_unpadding(mallCipher.decrypt(msg))).decode()
+    print("Mallory was able to uncover: ", mallPlainText)
     return 0
 
 rsaKey = rsaKey(256)
@@ -67,7 +70,7 @@ AESKey = myAES.make_key()
 AESIv = myAES.make_iv()
 #print(keyExchange(AESKey,AESIv,rsaKey))
 
-print("Mallory figured this out: ", keyExchangeMallory(AESKey,AESIv, rsaKey))
+keyExchangeMallory(AESKey,AESIv, rsaKey)
 
 
 
