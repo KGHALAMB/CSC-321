@@ -31,7 +31,7 @@ def rsaDecrypt(privateKey, ciphertext):
     n = privateKey[1]
     plain = pow(ciphertext, d, n)
     hex_str = '{:0>2x}'.format(plain)
-    msg = bytes.fromhex(hex_str).decode()
+    msg = bytes.fromhex(hex_str).decode(errors="ignore")
     #print("decrypted: ", msg)
     return msg
 def keyHash(key):
@@ -62,15 +62,33 @@ def keyExchangeMallory(AESKey, AESIv, rsaKey):
     #mallory can figure out what the encrypted message is, purely through her own hashed key
     mallCipher = AES.new(mallHashedKey, AES.MODE_CBC, AESIv)
     mallPlainText = (myAES.pkcs7_unpadding(mallCipher.decrypt(msg))).decode()
-    print("Mallory was able to uncover: ", mallPlainText)
-    return 0
+    return mallPlainText
+def malloryCausesChaos(AESKey, AESIv, rsaKey):
+    #Alice encrypts the AES Key
+    encrypted = rsaEncrypt(rsaKey["publicKey"], str(AESKey))
+    #mallory tampers with the cipher text that alice makes
+    tamperedEncrypted = int(encrypted + 1)
+    #bob Decrypts the tampered RSA cipher text, then hashes it into a key
+    key = rsaDecrypt(rsaKey["privateKey"], tamperedEncrypted)
+    hashedKey = (keyHash(key)[:32]).encode()
+    # bob uses the changed key to cbc encrypt 
+    msg_byte = ("Hi Bob!").encode('utf-8')
+    msg = myAES.cbc_encrypt(hashedKey, AESIv, myAES.pkcs7_padding(msg_byte))
+    # The message that alice recieves is decrypted with the AES Key she knows
+    realKey = (keyHash(AESKey)[:32]).encode()
+    Cipher = AES.new(realKey, AES.MODE_CBC, AESIv)
+    scrambledMsg = (myAES.pkcs7_unpadding(Cipher.decrypt(msg))).decode()
+    return scrambledMsg
 
-rsaKey = rsaKey(256)
+
+MyRsaKey = rsaKey(256)
 AESKey = myAES.make_key()
 AESIv = myAES.make_iv()
-#print(keyExchange(AESKey,AESIv,rsaKey))
+print("Mallory found the plaintext: ", keyExchangeMallory(AESKey,AESIv, MyRsaKey))
 
-keyExchangeMallory(AESKey,AESIv, rsaKey)
+MyRsaKey = rsaKey(256)
+AESKey = myAES.make_key()
+AESIv = myAES.make_iv()
 
-
-
+#keyExchange(AESKey, AESIv, MyRsaKey)
+print("After Mallory attacked the integrity, instead of Hi Bob!, bob recieved: ", malloryCausesChaos(AESKey,AESIv, MyRsaKey))
