@@ -84,11 +84,11 @@ def malloryCausesChaos(AESKey, AESIv, rsaKey):
 MyRsaKey = rsaKey(256)
 AESKey = myAES.make_key()
 AESIv = myAES.make_iv()
-print("Mallory found the plaintext: ", keyExchangeMallory(AESKey,AESIv, MyRsaKey))
+print("After Alice Sends the text: Hi Bob!\nMallory found the plaintext: ", keyExchangeMallory(AESKey,AESIv, MyRsaKey))
 
-MyRsaKey = rsaKey(256)
-AESKey = myAES.make_key()
-AESIv = myAES.make_iv()
+#MyRsaKey = rsaKey(256)
+#AESKey = myAES.make_key()
+#AESIv = myAES.make_iv()
 
 #keyExchange(AESKey, AESIv, MyRsaKey)
-print("After Mallory attacked the integrity, instead of Hi Bob!, bob recieved: ", malloryCausesChaos(AESKey,AESIv, MyRsaKey))
+#print("After Mallory attacked the integrity, instead of Hi Bob!, bob recieved: ", malloryCausesChaos(AESKey,AESIv, MyRsaKey))
