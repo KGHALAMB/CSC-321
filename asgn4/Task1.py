@@ -7,9 +7,8 @@ def birthdayAttack(size):
     hashes = {}
     start_time = time.time()
     attempts = 0
+    print("FOR SIZE: ", size)
     while True:
-        if attempts % 100000 == 0:
-            print(attempts)
         #take a random string and hash it
         input_str = str(random.random())
         hash_str = keyHash(input_str, size)
@@ -26,8 +25,11 @@ def birthdayAttack(size):
     end_time = time.time() - start_time
     print(end_time)
     print(attempts, "attempts")
-    
 def keyHash(key, size):
-    return((hashlib.sha256(str(key).encode()).hexdigest())[0:size])
+    return((hashlib.sha256(str(key).encode()).hexdigest())[0:size//4])
 
-birthdayAttack(12)
+i = 8
+#while i <= 50:
+#    birthdayAttack(i)
+#    i += 2
+birthdayAttack(48)
