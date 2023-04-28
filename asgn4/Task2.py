@@ -28,21 +28,15 @@ print(parts)
 #Test
 test_word = "registrationsucks"
 test_encode = "$2b$08$J9FW66ZdPI2nrIMcOxFYI."
-print(bcrypt.hashpw(test_word.encode('utf-8'), test_encode.encode('utf-8')))
+ret = bcrypt.hashpw(test_word.encode('utf-8'), test_encode.encode('utf-8'))
+print(ret)
 
-print(bcrypt.checkpw(test_word.encode('utf-8'), b'$2b$08$J9FW66ZdPI2nrIMcOxFYI.zKGJsUXmWLAYWsNmIANUy5JbSjfyLFu'))
-
-'''
-name = parts[0]
-salthash = '$' + parts[1] + '$' + parts[2] + '$' + parts[3]
-match = next((word for word in filtered_words if bcrypt.checkpw(word.encode('utf-8'), salthash.encode('utf-8'))), None)
-if match:
-    print(name)
-    print(match)
-'''
+print(bcrypt.checkpw(test_word.encode('utf-8'), ret))
 
 name = parts[0]
 salthash = '$' + parts[1] + '$' + parts[2] + '$' + parts[3]
+print(name)
+print(salthash)
 for word in filtered_words:
     if bcrypt.checkpw(word.encode('utf-8'), salthash.encode('utf-8')):
         print(name)
